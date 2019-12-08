@@ -1,7 +1,7 @@
 import os
 
-_key = ['int','long','short','float','double','char','void','if','else','do','while','for','continue','break','return']
-_num = ['1','2','3','4','5','6','7','8','9','0']
+_key = ['int','long','short','float','double','char','void','if','then','else','do','while','for','continue','break','return']
+_num = ['0','1','2','3','4','5','6','7','8','9']
 _jiefu = ['(',')','[',']','{','}',';',',']
 _symbol1 = ['+','-','*','/','%']
 _symbol2 = ['=','>','<','!','&','|']
@@ -29,11 +29,11 @@ def main():
             elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
                 word_space = 1
                 word_kind = 'word'
-                word_now = word_now + i
+                word_now = i
             elif i in _num:
                 word_space = 1
                 word_kind = 'number'
-                word_now = word_now + i
+                word_now = int(i)
             elif i=='#':
                 word_space = 1
                 word_kind = 'header'
@@ -47,7 +47,7 @@ def main():
             elif i in _symbol2:
                 word_space = 1
                 word_kind = 'symbol'
-                word_now = word_now + i
+                word_now = i
             else:
                 err()
                 
@@ -103,7 +103,7 @@ def main():
                 elif i in _num:
                     words.append([word_kind,word_now])
                     word_kind = 'number'
-                    word_now = i
+                    word_now = int(i)
                 elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
                     words.append([word_kind,word_now])
                     word_kind = 'word'
@@ -116,7 +116,7 @@ def main():
                     
             elif word_kind=='number':
                 if i in _num:
-                    word_now = word_now + i
+                    word_now = int(word_now)*10 + int(i)
                 else:
                     err()
                      
@@ -127,6 +127,7 @@ def main():
                     err()
             else:
                 err()
+                
     for i in words:
         if i[0]=='header':
             if i[1]=='define':
