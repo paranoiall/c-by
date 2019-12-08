@@ -1,0 +1,9 @@
+#include<stdio.h>
+
+int main(){
+int a=,b=2;
+int c[15]={0,1,2};
+if(c>=a+b){
+c=a+b;
+}
+}
