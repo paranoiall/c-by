@@ -1,8 +1,8 @@
 import os
 
-_key = ['int','long','short','float','double','char','void','if','then','else','do','while','for','continue','break','return']
+_key = ['int','long','short','float','double','if','else','while','continue','break','return','printf']
 _num = ['0','1','2','3','4','5','6','7','8','9']
-_jiefu = ['(',')','[',']','{','}',';',',']
+_jiefu = ['(',')','{','}',';',',']
 _symbol1 = ['+','-','*','/','%']
 _symbol2 = ['=','>','<','!','&','|']
 
@@ -34,16 +34,13 @@ def main():
                 word_space = 1
                 word_kind = 'number'
                 word_now = int(i)
-            elif i=='#':
-                word_space = 1
-                word_kind = 'header'
             elif i=='"':
                 word_space = 1
                 word_kind = 'value'
             elif i in _jiefu:
                 words.append(['jiefu',i])
             elif i in _symbol1:
-                words.append(['symbol',i])
+                words.append(['symbol_yunsuan',i])
             elif i in _symbol2:
                 word_space = 1
                 word_kind = 'symbol'
@@ -57,9 +54,6 @@ def main():
                 word_kind = ''
                 word_now = ''
                 word_space = 0
-                
-            elif word_kind=='header':
-                word_now = word_now + i
 
             elif word_kind=='value':
                 if i=='"':
@@ -79,7 +73,7 @@ def main():
                 
             elif i in _symbol1:
                 words.append([word_kind,word_now])
-                words.append(['symbol',i])
+                words.append(['symbol_yunsuan',i])
                 word_kind = ''
                 word_now = ''
                 word_space = 0
@@ -88,26 +82,44 @@ def main():
                 if word_now=='&' or word_now=='|':
                     if word_now == i:
                         word_now = word_now + i
-                        words.append([word_kind,word_now])
+                        words.append(['symbol_luoji',word_now])
                         word_kind = ''
                         word_now = ''
                         word_space = 0
                     else:
                         err()
+                        
                 elif i=='=':
                     word_now = word_now + i
-                    words.append([word_kind,word_now])
+                    words.append(['symbol_bijiao',word_now])
                     word_kind = ''
                     word_now = ''
                     word_space = 0
+                    
+                elif word_now=='=' or word_now=='!':
+                    if i in _num:
+                        words.append(['symbol',word_now])
+                        word_kind = 'number'
+                        word_now = int(i)
+                    elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
+                        words.append(['symbol',word_now])
+                        word_kind = 'word'
+                        word_now = i
+                    else:
+                        err()
+                        
                 elif i in _num:
-                    words.append([word_kind,word_now])
+                    words.append(['symbol_bijiao',word_now])
                     word_kind = 'number'
                     word_now = int(i)
+                    
                 elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
-                    words.append([word_kind,word_now])
+                    words.append(['symbol_bijiao',word_now])
                     word_kind = 'word'
                     word_now = i
+                    
+                else:
+                    err()
                     
             elif i in _symbol2:
                 words.append([word_kind,word_now])

@@ -1,10 +1,10 @@
-#include<stdio.h>
 
 int main(){
 int a=,b=2;
-int c[15]={0,1,2};
-if(c>=a+b){
-c[0]=c[1];
+int c;
+if(!c && c || c!=c){
+
 c=a+b;
+printf("asdf");
 }
 }
