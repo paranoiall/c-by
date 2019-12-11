@@ -1,10 +1,9 @@
 
 int main(){
-int a=,b=2;
-int c;
-if(!c && c || c!=c){
-
-c=a+b;
-printf("asdf");
-}
+    int a,b=2;
+    int c;
+    if(b<3){
+        c=a+b;
+        printf("asdf");
+    }
 }

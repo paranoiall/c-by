@@ -40,7 +40,7 @@ def main():
             elif i in _jiefu:
                 words.append(['jiefu',i])
             elif i in _symbol1:
-                words.append(['symbol_yunsuan',i])
+                words.append(['SYMB',i])
             elif i in _symbol2:
                 word_space = 1
                 word_kind = 'symbol'
@@ -73,7 +73,7 @@ def main():
                 
             elif i in _symbol1:
                 words.append([word_kind,word_now])
-                words.append(['symbol_yunsuan',i])
+                words.append(['SYMB',i])
                 word_kind = ''
                 word_now = ''
                 word_space = 0
@@ -82,7 +82,7 @@ def main():
                 if word_now=='&' or word_now=='|':
                     if word_now == i:
                         word_now = word_now + i
-                        words.append(['symbol_luoji',word_now])
+                        words.append(['LOGIC',word_now])
                         word_kind = ''
                         word_now = ''
                         word_space = 0
@@ -91,7 +91,7 @@ def main():
                         
                 elif i=='=':
                     word_now = word_now + i
-                    words.append(['symbol_bijiao',word_now])
+                    words.append(['COMP',word_now])
                     word_kind = ''
                     word_now = ''
                     word_space = 0
@@ -109,12 +109,12 @@ def main():
                         err()
                         
                 elif i in _num:
-                    words.append(['symbol_bijiao',word_now])
+                    words.append(['COMP',word_now])
                     word_kind = 'number'
                     word_now = int(i)
                     
                 elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
-                    words.append(['symbol_bijiao',word_now])
+                    words.append(['COMP',word_now])
                     word_kind = 'word'
                     word_now = i
                     
@@ -154,5 +154,9 @@ def main():
                 i[0] = 'key'
     return words
 
-print(main())
-print("finish!")
+# print(main())
+# print("finish!")
+
+
+def cifafenxi():
+    return main()
