@@ -49,13 +49,7 @@ def main():
                 err()
                 
         elif word_space==1:
-            if i=='\n' or i==' ' or i=='\t':
-                words.append([word_kind,word_now])
-                word_kind = ''
-                word_now = ''
-                word_space = 0
-
-            elif word_kind=='value':
+            if word_kind=='value':
                 if i=='"':
                     words.append([word_kind,word_now])
                     word_kind = ''
@@ -63,6 +57,12 @@ def main():
                     word_space = 0
                 else:
                     word_now = word_now + i
+                    
+            elif i=='\n' or i==' ' or i=='\t':
+                words.append([word_kind,word_now])
+                word_kind = ''
+                word_now = ''
+                word_space = 0
                     
             elif i in _jiefu:
                 words.append([word_kind,word_now])
