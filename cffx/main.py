@@ -8,155 +8,142 @@ _symbol2 = ['=','>','<','!','&','|']
 
 def openfile():
     with open('file.txt') as f:
-        lines = f.read()
+        lines = f.readlines()
     return lines
 
 def main():
     def err():
-        print('error:')
-        print(i)
-        exit()
+        exit('Error：'+i+'错误！')
         
     words = []
     word_now = ''
     word_space = 0
     lines = openfile()
-    for i in lines:
-        if word_space==0:
-            if i=='\n' or i==' ' or i=='\t':
-                pass
-            
-            elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
-                word_space = 1
-                word_kind = 'word'
-                word_now = i
-            elif i in _num:
-                word_space = 1
-                word_kind = 'number'
-                word_now = int(i)
-            elif i=='"':
-                word_space = 1
-                word_kind = 'value'
-            elif i in _jiefu:
-                words.append(['jiefu',i])
-            elif i in _symbol1:
-                words.append(['SYMB',i])
-            elif i in _symbol2:
-                word_space = 1
-                word_kind = 'symbol'
-                word_now = i
-            else:
-                err()
+    for line_num in range(len(lines)):
+        for i in lines[line_num]:
+            if word_space==0:
+                if i=='\n' or i==' ' or i=='\t':
+                    pass
                 
-        elif word_space==1:
-            if word_kind=='value':
-                if i=='"':
-                    words.append([word_kind,word_now])
-                    word_kind = ''
-                    word_now = ''
-                    word_space = 0
+                elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
+                    word_space = 1
+                    word_kind = 'word'
+                    word_now = i
+                elif i in _num:
+                    word_space = 1
+                    word_kind = 'number'
+                    word_now = int(i)
+                elif i=='"':
+                    word_space = 1
+                    word_kind = 'value'
+                elif i in _jiefu:
+                    words.append(['jiefu',i])
+                elif i in _symbol1:
+                    words.append(['SYMB',i])
+                elif i in _symbol2:
+                    word_space = 1
+                    word_kind = 'symbol'
+                    word_now = i
                 else:
-                    word_now = word_now + i
+                    err()
                     
-            elif i=='\n' or i==' ' or i=='\t':
-                words.append([word_kind,word_now])
-                word_kind = ''
-                word_now = ''
-                word_space = 0
-                    
-            elif i in _jiefu:
-                words.append([word_kind,word_now])
-                words.append(['jiefu',i])
-                word_kind = ''
-                word_now = ''
-                word_space = 0
-                
-            elif i in _symbol1:
-                words.append([word_kind,word_now])
-                words.append(['SYMB',i])
-                word_kind = ''
-                word_now = ''
-                word_space = 0
-                
-            elif word_kind=='symbol':
-                if word_now=='&' or word_now=='|':
-                    if word_now == i:
-                        word_now = word_now + i
-                        words.append(['LOGIC',word_now])
+            elif word_space==1:
+                if word_kind=='value':
+                    if i=='"':
+                        words.append([word_kind,word_now])
                         word_kind = ''
                         word_now = ''
                         word_space = 0
                     else:
-                        err()
+                        word_now = word_now + i
                         
-                elif i=='=':
-                    word_now = word_now + i
-                    words.append(['COMP',word_now])
+                elif i=='\n' or i==' ' or i=='\t':
+                    words.append([word_kind,word_now])
+                    word_kind = ''
+                    word_now = ''
+                    word_space = 0
+                        
+                elif i in _jiefu:
+                    words.append([word_kind,word_now])
+                    words.append(['jiefu',i])
                     word_kind = ''
                     word_now = ''
                     word_space = 0
                     
-                elif word_now=='=' or word_now=='!':
-                    if i in _num:
-                        words.append(['symbol',word_now])
+                elif i in _symbol1:
+                    words.append([word_kind,word_now])
+                    words.append(['SYMB',i])
+                    word_kind = ''
+                    word_now = ''
+                    word_space = 0
+                    
+                elif word_kind=='symbol':
+                    if word_now=='&' or word_now=='|':
+                        if word_now == i:
+                            word_now = word_now + i
+                            words.append(['LOGIC',word_now])
+                            word_kind = ''
+                            word_now = ''
+                            word_space = 0
+                        else:
+                            err()
+                            
+                    elif i=='=':
+                        word_now = word_now + i
+                        words.append(['COMP',word_now])
+                        word_kind = ''
+                        word_now = ''
+                        word_space = 0
+                        
+                    elif word_now=='=' or word_now=='!':
+                        if i in _num:
+                            words.append(['symbol',word_now])
+                            word_kind = 'number'
+                            word_now = int(i)
+                        elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
+                            words.append(['symbol',word_now])
+                            word_kind = 'word'
+                            word_now = i
+                        else:
+                            err()
+                            
+                    elif i in _num:
+                        words.append(['COMP',word_now])
                         word_kind = 'number'
                         word_now = int(i)
+                        
                     elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
-                        words.append(['symbol',word_now])
+                        words.append(['COMP',word_now])
                         word_kind = 'word'
                         word_now = i
+                        
                     else:
                         err()
                         
-                elif i in _num:
-                    words.append(['COMP',word_now])
-                    word_kind = 'number'
-                    word_now = int(i)
-                    
-                elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
-                    words.append(['COMP',word_now])
-                    word_kind = 'word'
+                elif i in _symbol2:
+                    words.append([word_kind,word_now])
+                    word_kind = 'symbol'
                     word_now = i
-                    
+                        
+                elif word_kind=='number':
+                    if i in _num:
+                        word_now = int(word_now)*10 + int(i)
+                    else:
+                        err()
+                        
+                elif word_kind=='word':
+                    if (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_' or (i in _num):
+                        word_now = word_now + i
+                    else:
+                        err()
                 else:
                     err()
-                    
-            elif i in _symbol2:
-                words.append([word_kind,word_now])
-                word_kind = 'symbol'
-                word_now = i
-                    
-            elif word_kind=='number':
-                if i in _num:
-                    word_now = int(word_now)*10 + int(i)
-                else:
-                    err()
-                     
-            elif word_kind=='word':
-                if (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_' or (i in _num):
-                    word_now = word_now + i
-                else:
-                    err()
-            else:
-                err()
                 
-    for i in words:
-        if i[0]=='header':
-            if i[1]=='define':
-                i[0] = 'define'
-            elif i[1][0:7]=='include':
-                i[0] = 'include'
-            else:
-                err()
-                
-        elif i[0]=='word':
-            if i[1] in _key:
-                i[0] = 'key'
+        for i in range(len(words)):
+            if len(words[i]) < 3:
+                words[i].append(line_num)
+            if words[i][0]=='word':
+                if words[i][1] in _key:
+                    words[i][0] = 'key'
     return words
-
-# print(main())
-# print("finish!")
-
-
-def cifafenxi():
-    return main()
+    

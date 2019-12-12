@@ -1,14 +1,14 @@
 
 int main(){
-    int a,b=2;
-    int c;
-    if(!(a+1>b) && ((b<3) || (a>1))){
-        c=a+b;
-        c = 2*a; 
+    int c,a=1;
+    int b=a;
+    if(!(a+1>2) && ((b) || (a>1))){
+        c=a+c;
+        c = 2*(a*b); 
         printf("asdf");
-        while(c>0){
+        while(1){
             printf("c");
-            c = c-1;
+            c = c+b;
         }
     }else{
         printf("not if");
