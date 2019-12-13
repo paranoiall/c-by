@@ -7,7 +7,7 @@ _symbol1 = ['+','-','*','/','%']
 _symbol2 = ['=','>','<','!','&','|']
 
 def openfile():
-    with open('file.txt') as f:
+    with open('../file.txt') as f:
         lines = f.readlines()
     return lines
 

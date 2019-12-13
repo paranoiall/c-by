@@ -36,7 +36,6 @@ grammars = {
 '''
 语义分析预定义
 '''
-
 #符号表
 vartable = []
 var = []
@@ -241,8 +240,6 @@ class Node:
     
 
 
-
-
 def LL1(show=False):
     global word_all, number_all
     stack = []          #符号栈
@@ -283,8 +280,6 @@ def LL1(show=False):
                 nodelist.reverse() #入栈前逆序
                 for item in nodelist:   
                     stack.append(item)
-
-
                 
                 # for i in range(len(arr)-1,-1,-1):
                 #     if arr[i] in grammars:    #产生式元素为非终结符
@@ -294,12 +289,12 @@ def LL1(show=False):
                 #             continue
                 #         temp_node = Node("notype",arr[i])
                 #     stack.append(temp_node)
-                    
-                # print("符号栈:", stack) 
-                # print("输入串:",word_table[index:])
-                # print("产生式:",s_top.type,"-->",temp)
-                # print("匹配字符:",w,"\n")
-                #print(temp.split())              
+                if show:
+                    print("符号栈:", stack) 
+                    print("输入串:",word_table[index:])
+                    print("产生式:",s_top.type,"-->",temp)
+                    print("匹配字符:",w,"\n")
+                    print(temp.split())              
             else :                # 读取的词法结果  是word  number这类,word是终结符但xxxxxxxx   [word,xxxxxx]                
                 w = word_table[index][0]        #    区别在此处
 
@@ -314,8 +309,7 @@ def LL1(show=False):
                     temp = predict_table[s_top.type][w] 
                     arr = temp.split()
 
-
-                    if s_top.type == 'VAL':
+                    if s_top.type == 'VAL':     #语义分析用
                         s_top.addr = newtemp()
                         # print(s_top)
 
@@ -334,20 +328,22 @@ def LL1(show=False):
                     for item in nodelist:   
                         stack.append(item)
                     
-                    # print("符号栈:", stack) 
-                    # print("输入串:",word_table[index:])
-                    # print("产生式:",s_top.type,"-->",temp)
-                    # print("匹配字符:",w,"\n")  
+                    if show:
+                        print("符号栈:", stack) 
+                        print("输入串:",word_table[index:])
+                        print("产生式:",s_top.type,"-->",temp)
+                        print("匹配字符:",w,"\n")  
                 else:
                     print("error 2") 
                     print(s_top.value, " 与 ", word_table[index][1],"不匹配")
                     return
         elif s_top.type not in grammars:
             if s_top.value != word_table[index][1]:
-                if word_table[index][0] == "word" or "number" and s_top.value == word_table[index][0]:  #为了文法里word的坑                    
-                    # print("符号栈:", stack) 
-                    # print("输入串:",word_table[index:])
-                    # print("匹配并出栈字符:",s_top.value,"\n") 
+                if word_table[index][0] == "word" or "number" and s_top.value == word_table[index][0]:  #为了文法里word的坑   
+                    if show:                 
+                        print("符号栈:", stack) 
+                        print("输入串:",word_table[index:])
+                        print("匹配并出栈字符:",s_top.value,"\n") 
                     s_top.text = word_table[index][1]
                     #val  addr = newtemp()
                     index += 1
@@ -356,9 +352,10 @@ def LL1(show=False):
                     print(s_top.value, " 与 ", word_table[index][1],"不匹配")
                     return
             elif s_top.value == word_table[index][1]:
-                # print("符号栈:", stack) 
-                # print("输入串:",word_table[index:])
-                # print("匹配并出栈字符:",s_top.value,"\n") 
+                if show:
+                    print("符号栈:", stack) 
+                    print("输入串:",word_table[index:])
+                    print("匹配并出栈字符:",s_top.value,"\n") 
                 # if(index == len(word_table)-1):
                 #     print("final ",stack)
                 index += 1
@@ -366,9 +363,49 @@ def LL1(show=False):
 
 
 
+
+
+def create_tree():      #返回语法树
+    get_first_table()
+    find_follow()
+    get_predict_table()
+    r = LL1()
+    return r
+
+if __name__ == "__main__":
+    get_first_table()
+    find_follow()
+    get_predict_table()
+    # get_first_table()
+    # for k in first_table:
+    #     print(k, first_table[k])
+    # find_follow()
+    # print("\nfollow \n")
+    # for k in follow_table:
+    #     print(k, follow_table[k])
+    # print("\n预测表如下\n")
+    # for k in predict_table:
+    #     print(k, predict_table[k])
+    show = False
+    r = LL1(show)
+    print("\n语法树:")
+    print(r[1])
+
+    # # 语义分析
+    # yffx(r[1])
+    # for i in range(len(emit_result)):
+    #     print(i,':',emit_result[i])
+
+
+
+
+
+
+
+
 '''
 语义分析开始
-'''
+
 
 def yffx(root):
     if root == None:
@@ -524,32 +561,5 @@ def judge(root):
     else:
         exit('Error：函数'+root.child[0].value+'未定义！')
 
-'''
 语义分析结束
 '''
-
-
-
-if __name__ == "__main__":
-    get_first_table()
-    find_follow()
-    get_predict_table()
-    # get_first_table()
-    # for k in first_table:
-    #     print(k, first_table[k])
-    # find_follow()
-    # print("\nfollow \n")
-    # for k in follow_table:
-    #     print(k, follow_table[k])
-    # print("\n预测表如下\n")
-    # for k in predict_table:
-    #     print(k, predict_table[k])
-
-    r = LL1()
-    # print("\n语法树:")
-    # print(r[1])
-
-    # 语义分析
-    yffx(r[1])
-    for i in range(len(emit_result)):
-        print(i,':',emit_result[i])
