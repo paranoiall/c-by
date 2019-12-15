@@ -9,11 +9,19 @@ _symbol2 = ['=','>','<','!','&','|']
 def openfile():
     with open('../file.txt') as f:
         lines = f.readlines()
+        f.close()
     return lines
 
+err_meg = None
+
 def main():
+    global err_meg
+    err_meg = None
     def err():
-        exit('Error：'+i+'错误！')
+        global err_meg
+        err_meg = 'Error：'+i+'错误！（Line'+str(line_num)+'）'
+        # exit('Error：'+i+'错误！')
+    
         
     words = []
     word_now = ''
@@ -147,3 +155,7 @@ def main():
                     words[i][0] = 'key'
     return words
     
+
+
+if __name__ == "__main__":
+    print(main())

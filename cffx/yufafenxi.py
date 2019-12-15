@@ -3,7 +3,8 @@ import sys
 sys.setrecursionlimit(1000000)  #设置最大递归深度
 
 import main
-word_table = main.main()
+word_table = []
+
 # print(word_table)
 
 #文法
@@ -22,6 +23,7 @@ grammars = {
     "P_VAL":    ["word", "value"],
     "VAL_E":   	["VAL VAL_E2"],
     "VAL_E2":   ["COMP VAL", "null"],
+
     "VAL":		["T VAL2"],
     "VAL2":      ["SYMB VAL", "null"],               #提公因子
     "T":        ["( VAL )", "word", "number"], 
@@ -111,6 +113,7 @@ predict_table = {}
 observer = {}
 
 def get_first_table():
+    global first_table,follow_table,predict_table,predict_table,observer
     for k in grammars:      #遍历每个非终结符        
         predict_table[k] = {}
         first_table[k] = []
@@ -127,6 +130,7 @@ def get_first_table():
 #查找所有非终结符follow
 
 def init_observer():    #将产生式右部最后符号为不等于左边非终截符的产生式添加至observer中
+    global first_table,follow_table,predict_table,predict_table,observer
     for k in grammars:
         follow_table[k] = []
         observer[k] = []
@@ -142,6 +146,7 @@ def init_observer():    #将产生式右部最后符号为不等于左边非终�
 并且，这是一个递归过程
 """
 def refresh(k):
+    global first_table,follow_table,predict_table,predict_table,observer
     for lk in observer[k]:
         newlk = U(follow_table[k], follow_table[lk])
         if newlk != follow_table[lk]:
@@ -155,6 +160,7 @@ def U(A,B):
 
 #   #为结束符
 def find_follow():
+    global first_table,follow_table,predict_table,predict_table,observer
     init_observer()
     follow_table["P"] = ["#"]
     for k in grammars:
@@ -197,6 +203,7 @@ def find_follow():
 将follow集合中的部分内容加入predict表中
 """
 def get_predict_table():
+    global first_table,follow_table,predict_table,predict_table,observer
     for k in grammars:
         for next_grammar in grammars[k]:
             next_k = next_grammar.split()[0]
@@ -241,6 +248,7 @@ class Node:
 
 
 def LL1(show=False):
+    global first_table,follow_table,predict_table,predict_table,observer
     global word_all, number_all
     stack = []          #符号栈
     root = Node("P")
@@ -336,7 +344,8 @@ def LL1(show=False):
                 else:
                     print("error 2") 
                     print(s_top.value, " 与 ", word_table[index][1],"不匹配")
-                    return
+                    err_info = str(s_top.value) + " 与 " + str(word_table[index][1]) + " 不匹配" + "  in line"+ str(word_table[index][2])                    
+                    return [False,err_info]
         elif s_top.type not in grammars:
             if s_top.value != word_table[index][1]:
                 if word_table[index][0] == "word" or "number" and s_top.value == word_table[index][0]:  #为了文法里word的坑   
@@ -350,7 +359,10 @@ def LL1(show=False):
                 else:
                     print("error")
                     print(s_top.value, " 与 ", word_table[index][1],"不匹配")
-                    return
+                    print("in line",word_table[index][2])
+                
+                    err_info = str(s_top.value) + " 与 " + str(word_table[index][1]) + " 不匹配" + "  in line"+ str(word_table[index][2])                    
+                    return [False,err_info]
             elif s_top.value == word_table[index][1]:
                 if show:
                     print("符号栈:", stack) 
@@ -366,13 +378,25 @@ def LL1(show=False):
 
 
 def create_tree():      #返回语法树
+    global word_table,temp_now,first_table,follow_table,predict_table,observer
+    first_table = {}
+    follow_table = {}
+    predict_table = {}
+    observer = {}
+
+    word_table = main.main()
+    temp_now = 0
+    if main.err_meg != None:
+        return [False, main.err_meg]
     get_first_table()
     find_follow()
     get_predict_table()
-    r = LL1()
+    r = LL1()   
     return r
-
+        
 if __name__ == "__main__":
+    word_table = main.main()
+
     get_first_table()
     find_follow()
     get_predict_table()
@@ -388,178 +412,12 @@ if __name__ == "__main__":
     #     print(k, predict_table[k])
     show = False
     r = LL1(show)
-    print("\n语法树:")
-    print(r[1])
+    if(r):
+        print("\n语法树:")
+        print(r[1])
 
     # # 语义分析
     # yffx(r[1])
     # for i in range(len(emit_result)):
     #     print(i,':',emit_result[i])
 
-
-
-
-
-
-
-
-'''
-语义分析开始
-
-
-def yffx(root):
-    if root == None:
-        return None
-    elif len(root.child) == 0 and root.value != None:
-        return root.value
-    elif root.type == "STAT":
-        math_op(root)
-    elif root.type == "E":
-        judge(root)
-    else:
-        for c in root.child:
-            yffx(c)
-        return None
-
-
-def val_cl(root):
-    if root.child[0].child[0].value == '(':
-        emit_push('=', root.child[0].child[1].addr, None, root.addr)
-        val_cl(root.child[0].child[1])
-        
-    # 出错了用下面这个
-    # elif root.child[1].child:
-    #     if root.child[1].child[0].type == 'SYMB':
-    #         if root.child[0].child[0].value == 'word':
-    #             var_lookup(root.child[0].child[0].text)
-    #         emit_push(root.child[1].child[0].child[0].value, root.child[0].child[0].text, root.child[1].child[1].addr, root.addr)
-    #         val_cl(root.child[1].child[1])
-
-    # elif root.child[0].child[0].value == 'word':
-    #     var_lookup(root.child[0].child[0].text)
-    #     root.addr = root.child[0].child[0].text
-    #     # 出错了用下面这个，需要简化四元式
-    #     # emit_push('=', root.child[0].child[0].text, None, root.addr)
-
-    elif root.child[0].child[0].value == 'word':
-        var_lookup(root.child[0].child[0].text)
-        if root.child[1].child and root.child[1].child[0].type == 'SYMB':
-                emit_push(root.child[1].child[0].child[0].value, root.child[0].child[0].text, root.child[1].child[1].addr, root.addr)
-                val_cl(root.child[1].child[1])
-        else:
-            if root.addr:
-                emit_push('=', root.child[0].child[0].text, None, root.addr)
-            else:
-                root.addr = root.child[0].child[0].text
-            # 出错了用下面这个，需要简化四元式
-            # emit_push('=', root.child[0].child[0].text, None, root.addr)
-    
-    elif root.child[0].child[0].value == 'number':
-        emit_push('=', root.child[0].child[0].text, None, root.addr)
-        
-    else:
-        exit('Error：赋值错误！')
-
-
-word_now = ''
-def math_op(root):
-    global word_now
-    ids = root.child[1]
-    if ids.child[0].value == 'word':
-        word_now = ids.child[0].text
-        math_op(root.child[1])
-
-    elif ids.child[0].value == ';':
-        var_insert(word_now)
-        emit('=', None, None, word_now)
-        word_now = ''
-
-    elif ids.child[0].value == ',':
-        var_insert(word_now)
-        emit('=', None, None, word_now)
-        word_now = ''
-        math_op(root.child[1])
-
-    elif ids.child[0].value == '=':
-        ids.child[1].addr = word_now
-        val_cl(ids.child[1])
-        emit_pop()
-        var_insert(word_now)
-        word_now = ''
-    else:
-        exit('Error：变量声明错误！')
-
-
-def bool_cl(root): 
-    global nxp
-    if root.child[0].value == '!':
-        root.truelist = root.child[1].falselist
-        root.falselist = root.child[1].truelist
-        bool_cl(root.child[1])
-
-    elif root.child[0].value == '(':
-        if root.child[3].child[0].value == '&&':
-            bool_cl(root.child[1])
-            enterlist(root.child[1].truelist)
-            root.falselist.extend(root.child[1].falselist)
-            bool_cl(root.child[5])
-            root.truelist.extend(root.child[5].truelist)
-            root.falselist.extend(root.child[5].falselist)
-
-        elif root.child[3].child[0].value == '||':
-            bool_cl(root.child[1])
-            enterlist(root.child[1].falselist)
-            root.truelist.extend(root.child[1].truelist)
-
-            bool_cl(root.child[5])
-            root.truelist.extend(root.child[5].truelist)
-            root.falselist.extend(root.child[5].falselist)
-
-    elif root.child[0].child[0].type == 'VAL':
-        val_cl(root.child[0].child[0])
-        emit_pop()
-        if root.child[0].child[1].child:
-            val_cl(root.child[0].child[1].child[1])
-            emit_pop()
-            emit(root.child[0].child[1].child[0].child[0].value, root.child[0].child[0].addr, root.child[0].child[1].child[1].addr, None)
-            root.truelist.append(nxp-1)
-            emit('jmp', None, None, None)
-            root.falselist.append(nxp-1)
-        else:
-            emit('==', root.child[0].child[0].addr, 'true', None)
-            root.truelist.append(nxp-1)
-            emit('jmp', None, None, None)
-            root.falselist.append(nxp-1)
-    else:
-        exit('Error：BOOL表达式错误！')
-        
-
-def judge(root):
-    if root.child[0].value == 'if':
-        bool_cl(root.child[2])
-        enterlist(root.child[2].truelist)
-        yffx(root.child[5])
-        enterlist(root.child[2].falselist)
-        if root.child[7]:
-            yffx(root.child[7].child[2])
-
-    elif root.child[0].value == 'while':
-        bool_cl(root.child[2])
-        enterlist(root.child[2].truelist)
-        yffx(root.child[5])
-        enterlist(root.child[2].falselist)
-
-    elif root.child[0].value == 'word':
-        var_lookup(root.child[0].text)
-        root.child[2].addr = root.child[0].text
-        val_cl(root.child[2])
-        emit_pop()
-
-    elif root.child[0].value == 'printf':
-        emit('out', root.child[2].child[0].text, None, None)
-
-    else:
-        exit('Error：函数'+root.child[0].value+'未定义！')
-
-语义分析结束
-'''

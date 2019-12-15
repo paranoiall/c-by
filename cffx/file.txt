@@ -14,3 +14,24 @@ int main(){
         printf("not if");
     }
 }
+
+
+int main(){
+	int a=1;
+    int c,b=(a+1)*2;
+    printf(a);
+    printf(b);
+    printf(c);
+    if((a==1)&&(b>a))
+    {
+        printf(a);
+        a=a-1;
+     	while(a){
+            printf(b);
+        }
+        printf("1");
+    }else{
+        printf("???");
+        printf(b);
+     }
+}
