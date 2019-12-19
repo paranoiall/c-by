@@ -14,7 +14,7 @@ def var_lookup(item):
         return vartable.index(item)
     else:
         err_meg = 'Error：变量'+item+'未声明！'
-        #exit(err_meg)
+        # exit(err_meg)
 
 def var_insert(item):
     global err_meg
@@ -23,7 +23,7 @@ def var_insert(item):
         return 1
     else:
         err_meg = 'Error：变量'+item+'重复声明！'
-        #exit(err_meg)
+        # exit(err_meg)
 
 #四元式
 emit_result=[[]]
@@ -231,7 +231,8 @@ def judge(root):
         stack.emit_pop()
 
     elif root.child[0].value == 'printf':
-        var_lookup(root.child[2].child[0])
+        if root.child[2].child[0].value == 'word':
+            var_lookup(root.child[2].child[0].text)
         emit('out', root.child[2].child[0].text, None, None)
 
     # else:
@@ -276,7 +277,6 @@ def youhua():
 
 
 import yufafenxi as yufa
-
 
 
 def create_siyuanshi():

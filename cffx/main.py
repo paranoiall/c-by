@@ -3,7 +3,7 @@ import os
 _key = ['int','long','short','float','double','if','else','while','continue','break','return','printf']
 _num = ['0','1','2','3','4','5','6','7','8','9']
 _jiefu = ['(',')','{','}',';',',']
-_symbol1 = ['+','-','*','/','%']
+_symbol1 = ['+','-','*','%']
 _symbol2 = ['=','>','<','!','&','|']
 
 def openfile():
@@ -19,20 +19,29 @@ def main():
     err_meg = None
     def err():
         global err_meg
-        err_meg = 'Error：'+i+'错误！（Line'+str(line_num)+'）'
-        # exit('Error：'+i+'错误！')
+        # print(word_now)
+        err_meg = 'Error：'+i+'（Line'+str(line_num)+'）'
+        # exit(err_meg)
     
         
     words = []
     word_now = ''
     word_space = 0
+    word_next = 0
     lines = openfile()
     for line_num in range(len(lines)):
+        word_next = 0
         for i in lines[line_num]:
+            if word_next == 1:
+                continue
+
             if word_space==0:
                 if i=='\n' or i==' ' or i=='\t':
                     pass
-                
+                elif i == '/':
+                    word_kind = 'SYMB'
+                    word_space = 1
+                    word_now = i
                 elif (i>='a' and i<='z') or (i>='A' and i<='Z') or i=='_':
                     word_space = 1
                     word_kind = 'word'
@@ -84,7 +93,7 @@ def main():
                     word_kind = ''
                     word_now = ''
                     word_space = 0
-                    
+
                 elif word_kind=='symbol':
                     if word_now=='&' or word_now=='|':
                         if word_now == i:
@@ -95,7 +104,7 @@ def main():
                             word_space = 0
                         else:
                             err()
-                            
+                                         
                     elif i=='=':
                         word_now = word_now + i
                         words.append(['COMP',word_now])
@@ -127,6 +136,18 @@ def main():
                         
                     else:
                         err()
+
+                elif i == '/':
+                    if word_now == '/':
+                        word_next = 1
+                        word_space = 0
+                        word_now = ''
+                        continue
+                    else:
+                        words.append([word_kind,word_now])
+                        words.append(['SYMB',i])
+                        word_space = 0
+                        word_now = ''
                         
                 elif i in _symbol2:
                     words.append([word_kind,word_now])
@@ -158,4 +179,6 @@ def main():
 
 
 if __name__ == "__main__":
-    print(main())
+    out = main()
+    for i in range(len(out)):
+        print(i,':',out[i])

@@ -24,7 +24,7 @@ def run_code(s):
             var_table[s[i][3]] = (var_table[s[i][1]] if(s[i][1] in var_table) else s[i][1]) % (var_table[s[i][2]] if(s[i][2] in var_table) else s[i][2])
         elif(s[i][0] == 'out'):
             out = var_table[s[i][1]] if(s[i][1] in var_table) else s[i][1]
-            print("out",out)
+            print("printf",out)
             res_out.append(out)
 
         elif s[i][0] == '>' :               #比较运算符
@@ -71,6 +71,9 @@ def res():
     global res_out
     res_out = []
     s = yuyi.create_siyuanshi()
+    if yuyi.err_meg != None:
+        return [yuyi.err_meg]
+
     if s[0]!=False:
         run_code(s)
     else:

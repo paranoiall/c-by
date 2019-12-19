@@ -58,6 +58,8 @@ def bianyi():
     code = data['code']     
     write_code(code)        #写文件
     res = yuyi.create_siyuanshi()
+    if(yuyi.err_meg != None):
+        return jsonify([0,yuyi.err_meg])
     print(res)
     if res[0] == False:
         return jsonify([0,res[1]])
